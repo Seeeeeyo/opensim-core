@@ -71,6 +71,9 @@ def ik_streaming_markers():
     
     # Create the IK solver (needs a reference, so we still create this)
     trc_markers_reference = osim.MarkersReference("test.trc", marker_weights)
+    # osim.SimTKArrayCoordinateReference(): An empty array to hold coordinate references
+    # Purpose: IK can optionally use coordinate references (like joint angle targets) in addition to marker data. Since we're only using markers, this is empty
+    # Why needed: The IK solver constructor requires this parameter even if we don't use coordinate-based targets
     coordinate_references = osim.SimTKArrayCoordinateReference()
     ik_solver = osim.InverseKinematicsSolver(model, trc_markers_reference, coordinate_references)
     

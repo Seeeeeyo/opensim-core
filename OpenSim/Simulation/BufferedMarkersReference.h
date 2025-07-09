@@ -8,7 +8,7 @@
  * through the Warrior Web program.                                           *
  *                                                                            *
  * Copyright (c) 2005-2023 Stanford University and the Authors                *
- * Author(s): Ayman Habib, Ajay Seth                                          *
+ * Author(s):                                      *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may    *
  * not use this file except in compliance with the License. You may obtain a  *
@@ -36,7 +36,7 @@ namespace OpenSim {
  * For example, reading marker data from a device and feeding it to a real-time
  * IK solver.
  *
- * @author Ayman Habib, Ajay Seth
+ * @author Selim Gilon
  */
 class OSIMSIMULATION_API BufferedMarkersReference : public MarkersReference {
     OpenSim_DECLARE_CONCRETE_OBJECT(BufferedMarkersReference, MarkersReference);

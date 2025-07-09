@@ -8,7 +8,7 @@
  * through the Warrior Web program.                                           *
  *                                                                            *
  * Copyright (c) 2005-2023 Stanford University and the Authors                *
- * Author(s): Ayman Habib, Ajay Seth                                          *
+ * Author(s):                                     *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may    *
  * not use this file except in compliance with the License. You may obtain a  *
@@ -32,7 +32,7 @@ namespace OpenSim {
 
 BufferedMarkersReference::BufferedMarkersReference()
         : MarkersReference() {
-    setAuthors("Ayman Habib, Ajay Seth");
+    setAuthors("Selim Gilon");
 }
 
 BufferedMarkersReference::BufferedMarkersReference(
@@ -40,7 +40,7 @@ BufferedMarkersReference::BufferedMarkersReference(
         const Set<MarkerWeight>& markerWeightSet,
         Units units)
         : MarkersReference(markerData, markerWeightSet, units) {
-    setAuthors("Ayman Habib, Ajay Seth");
+    setAuthors("Selim Gilon");
 }
 
 /** get the values of the MarkersReference */
