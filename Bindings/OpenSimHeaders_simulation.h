@@ -143,6 +143,7 @@
 #include <OpenSim/Simulation/AssemblySolver.h>
 #include <OpenSim/Simulation/Reference.h>
 #include <OpenSim/Simulation/MarkersReference.h>
+#include <OpenSim/Simulation/BufferedMarkersReference.h>
 #include <OpenSim/Simulation/CoordinateReference.h>
 #include <OpenSim/Simulation/OrientationsReference.h>
 #include <OpenSim/Simulation/InverseKinematicsSolver.h>

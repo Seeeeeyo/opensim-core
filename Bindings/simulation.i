@@ -245,6 +245,8 @@ OpenSim::ModelComponentSet<OpenSim::Controller>;
 %template(SharedOrientationsReference) std::shared_ptr<OpenSim::OrientationsReference>;
 %include <OpenSim/Simulation/BufferedOrientationsReference.h>
 %shared_ptr(OpenSim::BufferedOrientationsReference);
+%include <OpenSim/Simulation/BufferedMarkersReference.h>
+%shared_ptr(OpenSim::BufferedMarkersReference);
 
 %include <OpenSim/Simulation/AssemblySolver.h>
 %include <OpenSim/Simulation/InverseKinematicsSolver.h>
