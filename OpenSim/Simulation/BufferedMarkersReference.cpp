@@ -33,6 +33,8 @@ namespace OpenSim {
 BufferedMarkersReference::BufferedMarkersReference()
         : MarkersReference() {
     setAuthors("Selim Gilon");
+    // Initialize the internal streamed data cache
+    _streamedMarkerTable = TimeSeriesTable_<SimTK::Vec3>();
 }
 
 BufferedMarkersReference::BufferedMarkersReference(
@@ -41,19 +43,34 @@ BufferedMarkersReference::BufferedMarkersReference(
         Units units)
         : MarkersReference(markerData, markerWeightSet, units) {
     setAuthors("Selim Gilon");
+    // Initialize the internal streamed data cache, copy metadata from input
+    _streamedMarkerTable = TimeSeriesTable_<SimTK::Vec3>();
+    _streamedMarkerTable.setColumnLabels(markerData.getColumnLabels());
+    // Correctly copy the metadata
+    _streamedMarkerTable.updTableMetaData() = markerData.getTableMetaData();
 }
 
 /** get the values of the MarkersReference */
 void BufferedMarkersReference::getValuesAtTime(
         double time, SimTK::Array_<Vec3>& values) const {
-    SimTK::RowVector_<SimTK::Vec3> nextRow;
-    // This will now compile as _markerDataQueue is of the correct base type
-    _markerDataQueue.pop_front(time, nextRow);
 
+    // Follow the exact pattern from BufferedOrientationsReference
+    const auto& markerTable = getMarkerTable();
+    const auto& times = markerTable.getIndependentColumn();
+    SimTK::RowVector_<SimTK::Vec3> nextRow;
+
+    if (times.size() > 0 && time >= times.front() && time <= times.back()) {
+        // Data is in the initial table
+        nextRow = markerTable.getRow(time);
+    } else {
+        // Data needs to come from the queue
+        double queueTime;
+        _markerDataQueue.pop_front(queueTime, nextRow);
+    }
+    
     int n = nextRow.size();
     values.resize(n);
-
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) { 
         values[i] = nextRow[i];
     }
 }
@@ -62,8 +79,10 @@ double BufferedMarkersReference::getNextValuesAndTime(
         SimTK::Array_<SimTK::Vec3>& values) {
     double returnTime;
     SimTK::RowVector_<SimTK::Vec3> nextRow;
-    // This will now compile as _markerDataQueue is of the correct base type
+    
     _markerDataQueue.pop_front(returnTime, nextRow);
+    _streamedMarkerTable.appendRow(returnTime, nextRow);
+    
     int n = nextRow.size();
     values.resize(n);
 
@@ -75,7 +94,6 @@ double BufferedMarkersReference::getNextValuesAndTime(
 
 void BufferedMarkersReference::putValues(
         double time, const SimTK::RowVector_<SimTK::Vec3>& dataRow) {
-    // This will now compile as _markerDataQueue is of the correct base type
     _markerDataQueue.push_back(time, dataRow);
 }
 

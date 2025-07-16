@@ -49,6 +49,13 @@ public:
                             const Set<MarkerWeight>& markerWeightSet,
                             Units units = Units(Units::Meters));
 
+    /** get the time range for which this Reference values are valid,
+        based on the loaded marker data. Extended to infinity for streaming.*/
+    SimTK::Vec2 getValidTimeRange() const override {
+        SimTK::Vec2 tableRange = MarkersReference::getValidTimeRange();
+        return SimTK::Vec2(tableRange[0], SimTK::Infinity);
+    }
+
     /**
     * Get the values of the MarkersReference at a specific time.
     * This method will block until the underlying buffer has data up to the
@@ -73,6 +80,9 @@ private:
     // The data is mutable so that getValuesAtTime can be const.
     mutable DataQueue_<SimTK::Vec3> _markerDataQueue;
 
+    // A more robust internal cache to store streamed-in data, making this
+    // class behave more like a TimeSeriesTable to the outside world.
+    mutable TimeSeriesTable_<SimTK::Vec3> _streamedMarkerTable;
 };
 
 } // end of namespace OpenSim
