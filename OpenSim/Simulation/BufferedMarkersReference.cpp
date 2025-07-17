@@ -20,7 +20,6 @@
  * See the License for the specific language governing permissions and        *
  * limitations under the License.                                             *
  * -------------------------------------------------------------------------- */
-
 #include "BufferedMarkersReference.h"
 #include "MarkersReference.h"
 #include <OpenSim/Common/Units.h>
