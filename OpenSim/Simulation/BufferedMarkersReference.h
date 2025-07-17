@@ -8,7 +8,7 @@
  * through the Warrior Web program.                                           *
  *                                                                            *
  * Copyright (c) 2005-2023 Stanford University and the Authors                *
- * Author(s):                                      *
+ * Author(s): Selim Gilon                                                     *
  *                                                                            *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may    *
  * not use this file except in compliance with the License. You may obtain a  *
@@ -24,67 +24,83 @@
 #define OPENSIM_BUFFERED_MARKERS_REFERENCE_H_
 
 #include "MarkersReference.h"
-#include <OpenSim/Common/DataQueue.h>
 #include <OpenSim/Common/TimeSeriesTable.h>
-#include <OpenSim/Common/Units.h>
+#include <OpenSim/Common/Set.h>
+#include <OpenSim/Simulation/MarkersReference.h>
 
 namespace OpenSim {
+
+//=============================================================================
+//=============================================================================
 /**
- * A MarkersReference that provides the marker data from a buffer, intended to be
- * populated in real-time. This class is backed by a DataQueue of marker data
- * (Vec3s). This class is intended to be used in streaming applications.
- * For example, reading marker data from a device and feeding it to a real-time
- * IK solver.
+ * Subclass of MarkersReference that handles live marker data by providing a buffer
+ * that allows clients to push data into and allows the InverseKinematicsSolver to
+ * draw data from for solving.
+ * This follows the same pattern as BufferedOrientationsReference.
  *
  * @author Selim Gilon
  */
-class OSIMSIMULATION_API BufferedMarkersReference : public MarkersReference {
-    OpenSim_DECLARE_CONCRETE_OBJECT(BufferedMarkersReference, MarkersReference);
 
+class OSIMSIMULATION_API BufferedMarkersReference
+        : public MarkersReference {
+    OpenSim_DECLARE_CONCRETE_OBJECT(
+            BufferedMarkersReference, MarkersReference);
+
+//=============================================================================
+// METHODS
+//=============================================================================
 public:
+    //--------------------------------------------------------------------------
+    // CONSTRUCTION
+    //--------------------------------------------------------------------------
     BufferedMarkersReference();
-    
-    /** Constructor from TimeSeriesTable and marker weights */
-    BufferedMarkersReference(const TimeSeriesTable_<SimTK::Vec3>& markerData,
-                            const Set<MarkerWeight>& markerWeightSet,
-                            Units units = Units(Units::Meters));
+    BufferedMarkersReference(
+            const BufferedMarkersReference&) = default;
+    BufferedMarkersReference(BufferedMarkersReference&&) = default;
+    BufferedMarkersReference& operator=(
+            const BufferedMarkersReference&) = default;
 
+    // Use MarkersReference convenience constructor from TimeSeriesTable
+    using MarkersReference::MarkersReference;
+
+    virtual ~BufferedMarkersReference() {}
+
+    //--------------------------------------------------------------------------
+    // Reference Interface
+    //--------------------------------------------------------------------------
     /** get the time range for which this Reference values are valid,
-        based on the loaded marker data. Extended to infinity for streaming.*/
+        based on the loaded marker data.*/
     SimTK::Vec2 getValidTimeRange() const override {
-        SimTK::Vec2 tableRange = MarkersReference::getValidTimeRange();
+        SimTK::Vec2 tableRange = Super::getValidTimeRange();
         return SimTK::Vec2(tableRange[0], SimTK::Infinity);
-    }
+    };
 
-    /**
-    * Get the values of the MarkersReference at a specific time.
-    * This method will block until the underlying buffer has data up to the
-    * specified time.
-    */
-    void getValuesAtTime(
-            double time, SimTK::Array_<SimTK::Vec3>& values) const override;
+    /** get the values from the base MarkersReference, or from
+     * the client provided data that was queued earlier using putValues call. */
+    void getValuesAtTime(double time,
+            SimTK::Array_<SimTK::Vec3>& values) const override;
 
-    /**
-    * Get the next available frame of marker data and the corresponding time.
-    * This method will block until a frame is available in the buffer.
-    */
-    double getNextValuesAndTime(SimTK::Array_<SimTK::Vec3>& values);
-
-    /**
-    * Add a frame of marker data to the buffer at a specific time.
-    */
+    /** add passed in values to data processing buffer */
     void putValues(double time, const SimTK::RowVector_<SimTK::Vec3>& dataRow);
 
+    /** get the next values and time from the buffer (for streaming) */
+    double getNextValuesAndTime(SimTK::Array_<SimTK::Vec3>& values);
+
+    virtual bool hasNext() const override { 
+        return !_finished && _markerBuffer.getNumRows() > 0; 
+    };
+
+    void setFinished(bool finished) {
+        _finished = finished;
+    };
+
 private:
-    // The underlying DataQueue that holds the marker data.
-    // The data is mutable so that getValuesAtTime can be const.
-    mutable DataQueue_<SimTK::Vec3> _markerDataQueue;
-
-    // A more robust internal cache to store streamed-in data, making this
-    // class behave more like a TimeSeriesTable to the outside world.
-    mutable TimeSeriesTable_<SimTK::Vec3> _streamedMarkerTable;
-};
-
-} // end of namespace OpenSim
+    // Use a TimeSeriesTable for the buffer to support time-based lookup
+    mutable TimeSeriesTable_<SimTK::Vec3> _markerBuffer;
+    bool _finished{false};
+    //=============================================================================
+};  // END of class BufferedMarkersReference
+//=============================================================================
+} // namespace
 
 #endif // OPENSIM_BUFFERED_MARKERS_REFERENCE_H_ 

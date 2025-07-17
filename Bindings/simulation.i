@@ -248,6 +248,15 @@ OpenSim::ModelComponentSet<OpenSim::Controller>;
 %include <OpenSim/Simulation/BufferedMarkersReference.h>
 %shared_ptr(OpenSim::BufferedMarkersReference);
 
+%inline %{
+OpenSim::BufferedMarkersReference* make_buffered_markers_reference(
+    const OpenSim::TimeSeriesTableVec3& table,
+    const OpenSim::Set<OpenSim::MarkerWeight>& weights)
+{
+    return new OpenSim::BufferedMarkersReference(table, weights);
+};
+%}
+
 %include <OpenSim/Simulation/AssemblySolver.h>
 %include <OpenSim/Simulation/InverseKinematicsSolver.h>
 %include <OpenSim/Simulation/OpenSense/IMUPlacer.h>
@@ -419,4 +428,6 @@ EXPOSE_SET_CONSTRUCTORS_HELPER(ProbeSet);
 EXPOSE_SET_CONSTRUCTORS_HELPER(MarkerSet);
 EXPOSE_SET_CONSTRUCTORS_HELPER(WrapObjectSet);
 EXPOSE_SET_CONSTRUCTORS_HELPER(CoordinateSet);
+
+
 
