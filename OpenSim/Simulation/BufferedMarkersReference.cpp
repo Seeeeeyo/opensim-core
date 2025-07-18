@@ -106,7 +106,7 @@ void BufferedMarkersReference::putValues(
         } else {
             // Fallback: create generic labels based on dataRow size
             std::vector<std::string> labels;
-            for (size_t i = 0; i < dataRow.size(); ++i) {
+            for (int i = 0; i < dataRow.size(); ++i) {
                 labels.push_back("marker" + std::to_string(i));
             }
             _markerBuffer.setColumnLabels(labels);
