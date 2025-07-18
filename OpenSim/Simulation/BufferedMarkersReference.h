@@ -62,6 +62,12 @@ public:
 
     // Use MarkersReference convenience constructor from TimeSeriesTable
     using MarkersReference::MarkersReference;
+    
+    // Explicitly declare the constructor that takes TimeSeriesTable and Set<MarkerWeight>
+    // This ensures proper SWIG binding on all platforms
+    BufferedMarkersReference(const TimeSeriesTable_<SimTK::Vec3>& markerData,
+                            const Set<MarkerWeight>& markerWeightSet,
+                            Units units = Units(Units::Meters));
 
     virtual ~BufferedMarkersReference() {}
 

@@ -37,6 +37,14 @@ BufferedMarkersReference::BufferedMarkersReference()
     // Don't set column labels in constructor - they will be set when first data is added
 }
 
+BufferedMarkersReference::BufferedMarkersReference(
+        const TimeSeriesTable_<SimTK::Vec3>& markerData,
+        const Set<MarkerWeight>& markerWeightSet,
+        Units units)
+        : MarkersReference(markerData, markerWeightSet, units) {
+    setAuthors("Selim Gilon");
+}
+
 /** get the values of the MarkersReference */
 void BufferedMarkersReference::getValuesAtTime(
         double time, SimTK::Array_<Vec3>& values) const
